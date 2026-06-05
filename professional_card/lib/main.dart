@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+//project 2: Professional card using stateless and stateful widgets and simple styles
 
 void main() {
   runApp(const MyApp());
