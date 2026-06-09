@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "578730612078",
+    "project_id": "mark-it-bookmark-app",
+    "storage_bucket": "mark-it-bookmark-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:578730612078:android:5fcdfcb569cf8082c71d7f",
+        "android_client_info": {
+          "package_name": "com.example.mark_it_bookmark_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkxaACIZhOLZQkp-4kZ67cmNQYFJYl0y8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
