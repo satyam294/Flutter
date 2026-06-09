@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
+import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
@@ -19,60 +21,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: FirebaseTestPage(),
-    );
-  }
-}
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
 
-class FirebaseTestPage extends StatefulWidget {
-  const FirebaseTestPage({super.key});
+          if (snapshot.connectionState ==
+              ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
 
-  @override
-  State<FirebaseTestPage> createState() => _FirebaseTestPageState();
-}
+          if (snapshot.hasData) {
+            return HomeScreen();
+          }
 
-class _FirebaseTestPageState extends State<FirebaseTestPage> {
-  String status = 'Testing Firebase...';
-
-  @override
-  void initState() {
-    super.initState();
-    testFirebase();
-  }
-
-  Future<void> testFirebase() async {
-    try {
-      await FirebaseFirestore.instance.collection('test').add({
-        'message': 'Firebase connected successfully!',
-        'timestamp': Timestamp.now(),
-      });
-
-      setState(() {
-        status = 'Firebase & Firestore are working!';
-      });
-    } catch (e) {
-      setState(() {
-        status = 'Error:\n$e';
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Firebase Test'),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(
-            status,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 18),
-          ),
-        ),
+          return const LoginScreen();
+        },
       ),
     );
   }
