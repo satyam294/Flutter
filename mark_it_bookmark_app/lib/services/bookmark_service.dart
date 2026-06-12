@@ -44,4 +44,20 @@ class BookmarkService {
         .doc(bookmarkId)
         .delete();
   }
+
+  Future<void> updateBookmark({
+  required String bookmarkId,
+  required String title,
+  required String url,
+  }) async {
+  await _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('bookmarks')
+      .doc(bookmarkId)
+      .update({
+        'title': title,
+        'url': url,
+      });
+  }
 }

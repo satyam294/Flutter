@@ -43,6 +43,77 @@ class _HomeScreenState extends State<HomeScreen> {
     urlController.clear();
   }
 
+  Future<void> showEditDialog(
+  String bookmarkId,
+  String currentTitle,
+  String currentUrl,
+  ) async {
+    final titleController =
+        TextEditingController(text: currentTitle);
+
+    final urlController =
+        TextEditingController(text: currentUrl);
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Bookmark'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: urlController,
+                decoration: const InputDecoration(
+                  labelText: 'URL',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final title =
+                    titleController.text.trim();
+
+                final url =
+                    urlController.text.trim();
+
+                if (title.isEmpty || url.isEmpty) {
+                  return;
+                }
+
+                await bookmarkService.updateBookmark(
+                  bookmarkId: bookmarkId,
+                  title: title,
+                  url: url,
+                );
+
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     titleController.dispose();
@@ -99,10 +170,8 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20),
 
             Expanded(
-              child: StreamBuilder<
-                  QuerySnapshot>(
-                stream: bookmarkService
-                    .getBookmarks(),
+              child: StreamBuilder<QuerySnapshot>(
+                stream: bookmarkService.getBookmarks(),
                 builder:
                     (context, snapshot) {
                   if (!snapshot.hasData) {
@@ -131,34 +200,34 @@ class _HomeScreenState extends State<HomeScreen> {
                       final doc =
                           docs[index];
 
-                      final data =
-                          doc.data()
-                              as Map<
-                                  String,
-                                  dynamic>;
+                      final data = doc.data() as Map<String, dynamic>;
 
                       return Card(
                         child: ListTile(
-                          title: Text(
-                            data['title'],
-                          ),
-                          subtitle:
-                              Text(
-                            data['url'],
-                          ),
-                          trailing:
+                          title: Text(data['title']),
+                          subtitle: Text(data['url']),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
                               IconButton(
-                            icon:
-                                const Icon(
-                              Icons
-                                  .delete,
-                            ),
-                            onPressed:
-                                () async {
-                              await bookmarkService
-                                  .deleteBookmark(
-                                      doc.id);
-                            },
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  showEditDialog(
+                                    doc.id,
+                                    data['title'],
+                                    data['url'],
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () async {
+                                  await bookmarkService.deleteBookmark(
+                                    doc.id,
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       );
